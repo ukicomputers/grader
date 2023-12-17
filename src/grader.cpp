@@ -56,6 +56,12 @@ grader::RE_TYPE grader::throwRE(RE_TYPE re)
     {
         throw runtime_error("USUAL_FAIL");
     }
+    else if (re == IO_TESTS_NOT_FOUND)
+    {
+        cerr << "Declared directory for IO tests does not have tests, or does not have .in or .out with same filename." << endl
+             << endl;
+        throw runtime_error("IO_TESTS_NOT_FOUND");
+    }
 
     return re;
 }
@@ -75,7 +81,11 @@ grader::TEST_RESULT grader::compile()
 
     if (arg != string::npos)
     {
+#ifdef __linux__
         command.replace(arg, 9, code);
+#elif _WIN32
+        command.replace(arg, 9, code + ".exe");
+#endif
     }
 
     int compile_result = system(command.c_str());
@@ -83,5 +93,66 @@ grader::TEST_RESULT grader::compile()
     if (compile_result == -1)
     {
         return COMPILE_ERROR;
+    }
+}
+
+vector<grader::TEST_RESULT> grader::runTest()
+{
+    vector<TEST_RESULT> tests;
+
+    for (const auto &file : filesystem::directory_iterator(config.io))
+    {
+        if (file.is_regular_file())
+        {
+            filesystem::path fileName = file.path().stem();
+            filesystem::path requiredFilePath = fileName;
+            requiredFilePath += ".in";
+
+            if (filesystem::exists(requiredFilePath))
+            {
+                // Prepare IO tests
+                filesystem::path inputFilePath = fileName;
+                inputFilePath += ".in";
+
+                filesystem::path outFilePath = fileName;
+                outFilePath += ".out";
+
+                ifstream inputFile(inputFilePath);
+                if (!inputFile.is_open())
+                {
+                    throwRE(IO_TESTS_NOT_FOUND);
+                }
+
+                string REQUIRED_INPUT;
+                getline(inputFile, REQUIRED_INPUT);
+                inputFile.close();
+
+                ifstream outputFile(outFilePath);
+                if (!outputFile.is_open())
+                {
+                    throwRE(IO_TESTS_NOT_FOUND);
+                }
+
+                string REQUIRED_OUTPUT;
+                getline(outputFile, REQUIRED_OUTPUT);
+                outputFile.close();
+
+// Execute the program
+#ifdef __linux__
+                string executeProgram = "./" + code;
+#elif _WIN32
+                string executeProgram = "./" + code + ".exe";
+#endif
+
+                FILE *program = popen(executeProgram.c_str(), "w");
+                if (program == nullptr)
+                {
+                    tests.push_back(TEST_FAILED);
+                }
+
+                fwrite(REQUIRED_INPUT.c_str(), sizeof(char), strlen(REQUIRED_INPUT.c_str()), program);
+                fclose(program);
+            }
+        }
     }
 }

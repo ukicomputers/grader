@@ -60,7 +60,8 @@ private:
     {
         COMPILER_NOT_FOUND,
         CODE_NOT_FOUND,
-        USUAL_FAIL
+        USUAL_FAIL,
+        IO_TESTS_NOT_FOUND
     };
 
     RE_TYPE throwRE(RE_TYPE re);
