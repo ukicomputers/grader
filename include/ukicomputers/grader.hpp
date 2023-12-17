@@ -14,22 +14,26 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <filesystem>
 
 #ifdef __linux__
-#define COMPILER "g++ {filename} -O {outname}"
+#define COMPILER "g++"
+#define ARGUMENTS "{filename} -O {outname}"
 #else
 #define COMPILER "ndef"
+#define ARGUMENTS "ndef"
 #endif
 
 using namespace std;
 
 class configGrader
 {
-    public:
-    int8_t timeLimit = 0;          // For TLE, defined in MS, 0 for the none
-    int64_t memoryLimit = 0;       // For MLE, defined in KB, 0 for the none
-    string io;                     // Test Pending Folder
-    string compilation = COMPILER; // Compilation executor, use {filename} for input CPP, use {outfile} for compile out
+public:
+    int8_t timeLimit = 0;         // For TLE, defined in MS, 0 for the none
+    int64_t memoryLimit = 0;      // For MLE, defined in KB, 0 for the none
+    string io;                    // Test Pending Folder
+    string compiler = COMPILER;   // Execution command for COMPILER
+    string arguments = ARGUMENTS; // COMPILER executor, use {filename} for input CPP, use {outfile} for compile out
 };
 
 class grader
@@ -37,7 +41,7 @@ class grader
 public:
     enum TEST_RESULT
     {
-        COMPILER_ERROR,
+        COMPILE_ERROR,
         TEST_FAILED,
         MEMORY_LIMIT_EXCEEDED,
         TIME_LIMIT_EXCEEDED,
@@ -46,7 +50,7 @@ public:
 
     grader(string __code, configGrader __config);
     vector<TEST_RESULT> runTest();
-    int compile();
+    TEST_RESULT compile();
 
 private:
     string code;
