@@ -25,6 +25,7 @@ using namespace std;
 
 class configGrader
 {
+    public:
     int8_t timeLimit = 0;          // For TLE, defined in MS, 0 for the none
     int64_t memoryLimit = 0;       // For MLE, defined in KB, 0 for the none
     string io;                     // Test Pending Folder
