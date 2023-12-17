@@ -1,5 +1,5 @@
 # grader
 The Ultimate Grader For CPP Tests.
 
-# Not live yet. Still in phase of development. Check the **develop** branch for currently written code. Feel free for contribution.
-# If you ask, STILL NOT IN BETA.
+# You are currently located in develop branch. This branch is only for developing purposes. The real, user-friendly code is located in main branch.
+**To build, do quick pull request to test branch**

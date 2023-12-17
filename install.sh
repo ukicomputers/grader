@@ -9,4 +9,4 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc --all)
-# sudo make install
+sudo make install
