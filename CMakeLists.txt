@@ -1,3 +1,5 @@
+# Written by Uglješa Lukešević
+# github.com/ukicomputers/grader
 # NOT PRODUCTION VERSION, ONLY FOR TEST PURPOSES CURRENTLY, DO NOT PUSH IN main
 
 cmake_minimum_required (VERSION 3.8)
