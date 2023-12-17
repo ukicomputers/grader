@@ -1,6 +1,7 @@
 # grader
 The Ultimate Grader For CPP Tests.
 
-# You are currently located in test branch. This branch is only for testing purposes after finishing develop (quickjump to develop branch). The real, user-friendly code is located in main branch.
+# Not live yet. Still in phase of development. Check the **develop** branch for currently written code. Feel free for contribution.
+# If you ask, STILL NOT IN BETA.
 
-Auto tested. **Pull from develop first to test.**
+To develop code, go to the develop branch. For testing code from develop, create pull request from develop to test. Auto-testing is activated.
