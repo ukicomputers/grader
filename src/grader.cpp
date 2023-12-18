@@ -19,7 +19,8 @@ grader::grader(string __code, configGrader __config)
         return;
     }
 
-    // Currently adjusted for G++, NEEDS MORE VERSION CLARIFICATION TEST
+    // Currently adjusted for G++, only test does compiler works
+    // NEEDS CONFIGURATION FOR OTHER COMPILERS
     string test = __config.compiler + " --version";
 
     if (system(test.c_str()) == -1)
@@ -100,6 +101,11 @@ vector<grader::TEST_RESULT> grader::runTest()
 {
     vector<TEST_RESULT> tests;
 
+    if (compile() == COMPILE_ERROR)
+    {
+        return {COMPILE_ERROR};
+    }
+
     for (const auto &file : filesystem::directory_iterator(config.io))
     {
         if (file.is_regular_file())
@@ -108,51 +114,65 @@ vector<grader::TEST_RESULT> grader::runTest()
             filesystem::path requiredFilePath = fileName;
             requiredFilePath += ".in";
 
+            // Imagine that in and out with same name exists
             if (filesystem::exists(requiredFilePath))
             {
                 // Prepare IO tests
-                filesystem::path inputFilePath = fileName;
+                string inputFilePath = fileName;
                 inputFilePath += ".in";
 
                 filesystem::path outFilePath = fileName;
                 outFilePath += ".out";
 
-                ifstream inputFile(inputFilePath);
-                if (!inputFile.is_open())
+                if (!filesystem::exists(outFilePath))
                 {
                     throwRE(IO_TESTS_NOT_FOUND);
                 }
-
-                string REQUIRED_INPUT;
-                getline(inputFile, REQUIRED_INPUT);
-                inputFile.close();
-
-                ifstream outputFile(outFilePath);
-                if (!outputFile.is_open())
-                {
-                    throwRE(IO_TESTS_NOT_FOUND);
-                }
-
-                string REQUIRED_OUTPUT;
-                getline(outputFile, REQUIRED_OUTPUT);
-                outputFile.close();
 
 // Execute the program
 #ifdef __linux__
-                string executeProgram = "./" + code;
+                string executeProgram = "./" + code + " < " + inputFilePath;
 #elif _WIN32
-                string executeProgram = "./" + code + ".exe";
+                string executeProgram = "./" + code + ".exe" + " < " + inputFilePath;
 #endif
 
-                FILE *program = popen(executeProgram.c_str(), "w");
-                if (program == nullptr)
+                FILE *program = popen(executeProgram.c_str(), "r");
+                if (!program)
+                {
+                    tests.push_back(TEST_FAILED);
+                    continue;
+                }
+
+                ostringstream outStream;
+                vector<char> buffer(PRE_ALLOCATED_SIZE);
+
+                while (fgets(buffer.data(), static_cast<int>(buffer.size()), program) != nullptr)
+                {
+                    outStream << buffer.data();
+                }
+
+                fclose(program);
+                auto OUTPUT = outStream.str();
+
+                ifstream eOutStream(outFilePath);
+                ostringstream eOutBuffer;
+                eOutBuffer << eOutStream.rdbuf();
+
+                if (OUTPUT == eOutBuffer.str())
+                {
+                    tests.push_back(TEST_PASSED);
+                }
+                else
                 {
                     tests.push_back(TEST_FAILED);
                 }
-
-                fwrite(REQUIRED_INPUT.c_str(), sizeof(char), strlen(REQUIRED_INPUT.c_str()), program);
-                fclose(program);
+            }
+            else
+            {
+                throwRE(IO_TESTS_NOT_FOUND);
             }
         }
+
+        return tests;
     }
 }
