@@ -69,6 +69,7 @@ grader::RE_TYPE grader::throwRE(RE_TYPE re)
 
 grader::TEST_RESULT grader::compile()
 {
+    filesystem::path exCommand = code;
     string command = config.compiler + " " + config.arguments;
 
     size_t arg = command.find("{filename}");
@@ -78,7 +79,8 @@ grader::TEST_RESULT grader::compile()
         command.replace(arg, 10, code);
     }
 
-    arg = command.find("{outfile}");
+    code = exCommand.stem().string();
+    arg = command.find("{outname}");
 
     if (arg != string::npos)
     {
