@@ -21,4 +21,4 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc --all)
-./grader_testcase
+./grader-testcase
