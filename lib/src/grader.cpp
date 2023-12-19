@@ -5,11 +5,11 @@
 /*
     @author Uglješa Lukešević
     @file grader.cpp
-    @brief An CPP library for grading CPP codes.
+    @brief An CPP library for grading executable IO/s.
     Licensed under GNU GPL-3.0 License
 */
 
-#include <grader.hpp>
+#include "ukicomputers/grader.hpp"
 
 grader::grader(string __code, configGrader __config)
 {

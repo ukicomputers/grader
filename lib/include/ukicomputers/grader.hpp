@@ -5,7 +5,7 @@
 /*
     @author Uglješa Lukešević
     @file grader.hpp
-    @brief An CPP library for grading CPP codes.
+    @brief An CPP library for grading executable IO/s.
     Licensed under GNU GPL-3.0 License
 */
 
