@@ -43,13 +43,13 @@ grader::RE_TYPE grader::throwRE(RE_TYPE re)
 {
     if (re == COMPILER_NOT_FOUND)
     {
-        cerr << "Declared C++ (or C) compiler not found." << endl
+        cerr << "Declared code compiler not found." << endl
              << endl;
         throw runtime_error("COMPILER_NOT_FOUND");
     }
     else if (re == CODE_NOT_FOUND)
     {
-        cerr << "Declared C++ (or C) compilation code not found or acces is denied." << endl
+        cerr << "Declared compilation code not found or access is denied." << endl
              << endl;
         throw runtime_error("CODE_NOT_FOUND");
     }
@@ -174,7 +174,7 @@ vector<grader::TEST_RESULT> grader::runTest()
                 throwRE(IO_TESTS_NOT_FOUND);
             }
         }
-
-        return tests;
     }
+
+    return tests;
 }
