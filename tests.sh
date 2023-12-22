@@ -6,19 +6,23 @@
 # Uses sudo
 # USED ONLY FOR GITHUB ACTIONS
 
-rm -rf build_lib
-mkdir build_lib
-cd build_lib
+cd lib
+rm -rf build
+mkdir build
+cd build
 
-cmake ../lib
+cmake ..
 make -j$(nproc --all)
 sudo make install
 
 cd ..
+cd ..
 cd demo
 
+rm -rf build
 mkdir build
 cd build
+
 cmake ..
 make -j$(nproc --all)
 ./grader-testcase

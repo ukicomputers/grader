@@ -34,12 +34,14 @@ int main()
     {
         if (it == grader::TEST_PASSED)
         {
-            cout << "Test " << i << " passed!";
+            cout << "Test " << i << " passed!" << endl;
         }
         else
         {
-            cout << "Test " << i << " failed!";
+            cout << "Test " << i << " failed!" << endl;
         }
+
+        i++;
     }
 
     return 0;

@@ -4,9 +4,10 @@
 
 # @brief Build script for develop and installation
 
-rm -rf build_lib
-mkdir build_lib
-cd build_lib
-cmake ../lib
+cd lib
+rm -rf build
+mkdir build
+cd build
+cmake ..
 make -j$(nproc --all)
 sudo make install

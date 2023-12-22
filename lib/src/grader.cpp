@@ -19,11 +19,13 @@ grader::grader(string __code, configGrader __config)
         return;
     }
 
-    // Currently adjusted for G++, only test does compiler works
-    // NEEDS CONFIGURATION FOR OTHER COMPILERS
-    string test = __config.compiler + " --version";
+#ifdef __linux__
+    string check = "command -v " + __config.compiler;
+#elif _WIN32
+    string check = "where " + __config.compiler;
+#endif
 
-    if (system(test.c_str()) == -1)
+    if (system(check.c_str()) != 0)
     {
         throwRE(COMPILER_NOT_FOUND);
         return;
@@ -63,6 +65,12 @@ grader::RE_TYPE grader::throwRE(RE_TYPE re)
              << endl;
         throw runtime_error("IO_TESTS_NOT_FOUND");
     }
+    else if (re == IO_TESTS_FAILED_CONFIGURATION)
+    {
+        cerr << "Declared IO files are not right configured. Check documentation. Example below is right directory structure." << endl;
+        cout << "./io\n├── 1\n│   ├── 1.in\n│   └── 1.out\n├── 2\n│   ├── 2.in\n│   └── 2.out\n└── 3\n    ├── 3.in\n    └── 3.out\n";
+        throw runtime_error("IO_TESTS_FAILED_CONFIGURATION");
+    }
 
     return re;
 }
@@ -93,9 +101,13 @@ grader::TEST_RESULT grader::compile()
 
     int compile_result = system(command.c_str());
 
-    if (compile_result == -1)
+    if (compile_result != 0)
     {
         return COMPILE_ERROR;
+    }
+    else
+    {
+        return NAN;
     }
 }
 
@@ -108,25 +120,44 @@ vector<grader::TEST_RESULT> grader::runTest()
         return {COMPILE_ERROR};
     }
 
-    for (const auto &file : filesystem::directory_iterator(config.io))
+    if (filesystem::is_directory(config.io) && filesystem::exists(config.io))
     {
-        if (file.is_regular_file())
+        for (const auto &dir : filesystem::directory_iterator(config.io))
         {
-            filesystem::path fileName = file.path().stem();
-            filesystem::path requiredFilePath = fileName;
-            requiredFilePath += ".in";
-
-            // Imagine that in and out with same name exists
-            if (filesystem::exists(requiredFilePath))
+            if (filesystem::is_directory(dir))
             {
-                // Prepare IO tests
-                string inputFilePath = fileName;
-                inputFilePath += ".in";
+                string inputFilePath, outputFilePath;
 
-                filesystem::path outFilePath = fileName;
-                outFilePath += ".out";
+                // Find IO file
+                for (const auto &ioFile : filesystem::directory_iterator(dir))
+                {
+                    if (filesystem::is_regular_file(ioFile))
+                    {
+                        const auto &path = ioFile.path();
+                        if (path.extension() == ".in")
+                        {
+                            if (!inputFilePath.empty())
+                            {
+                                throwRE(IO_TESTS_FAILED_CONFIGURATION);
+                                break;
+                            }
 
-                if (!filesystem::exists(outFilePath))
+                            inputFilePath = path;
+                        }
+                        else if (path.extension() == ".out")
+                        {
+                            if (!outputFilePath.empty())
+                            {
+                                throwRE(IO_TESTS_FAILED_CONFIGURATION);
+                                break;
+                            }
+
+                            outputFilePath = path;
+                        }
+                    }
+                }
+
+                if (inputFilePath.empty() || outputFilePath.empty())
                 {
                     throwRE(IO_TESTS_NOT_FOUND);
                 }
@@ -135,7 +166,7 @@ vector<grader::TEST_RESULT> grader::runTest()
 #ifdef __linux__
                 string executeProgram = "./" + code + " < " + inputFilePath;
 #elif _WIN32
-                string executeProgram = "./" + code + ".exe" + " < " + inputFilePath;
+                string executeProgram = code + ".exe" + " < " + inputFilePath;
 #endif
 
                 FILE *program = popen(executeProgram.c_str(), "r");
@@ -156,7 +187,7 @@ vector<grader::TEST_RESULT> grader::runTest()
                 fclose(program);
                 auto OUTPUT = outStream.str();
 
-                ifstream eOutStream(outFilePath);
+                ifstream eOutStream(outputFilePath);
                 ostringstream eOutBuffer;
                 eOutBuffer << eOutStream.rdbuf();
 
@@ -169,11 +200,11 @@ vector<grader::TEST_RESULT> grader::runTest()
                     tests.push_back(TEST_FAILED);
                 }
             }
-            else
-            {
-                throwRE(IO_TESTS_NOT_FOUND);
-            }
         }
+    }
+    else
+    {
+        throwRE(IO_TESTS_NOT_FOUND);
     }
 
     return tests;
