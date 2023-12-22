@@ -13,7 +13,12 @@ cd build
 
 cmake ..
 make -j$(nproc --all)
-sudo make install
+
+if [[ "$(uname)" == "MINGW"* || "$(uname)" == "CYGWIN"* ]]; then
+    make install
+else
+    sudo make install
+fi
 
 cd ..
 cd ..
