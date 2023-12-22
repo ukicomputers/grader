@@ -5,6 +5,7 @@
 # @brief Build script for building everything
 # Uses sudo
 # USED ONLY FOR GITHUB ACTIONS
+# Tests ONLY FOR Linux (also supports Windows distribution, but not with this script)
 
 cd lib
 rm -rf build
@@ -13,12 +14,7 @@ cd build
 
 cmake ..
 make -j$(nproc --all)
-
-if [[ "$(uname)" == "MINGW"* || "$(uname)" == "CYGWIN"* ]]; then
-    make install
-else
-    sudo make install
-fi
+sudo make install
 
 cd ..
 cd ..
