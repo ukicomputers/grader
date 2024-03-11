@@ -49,12 +49,12 @@ class grader
 public:
     enum TEST_RESULT
     {
-        COMPILE_ERROR,
-        TEST_FAILED,
-        MEMORY_LIMIT_EXCEEDED,
-        TIME_LIMIT_EXCEEDED,
-        TEST_PASSED,
-        NAN
+        COMPILE_ERROR = 4,
+        TEST_FAILED = 1,
+        MEMORY_LIMIT_EXCEEDED = 2,
+        TIME_LIMIT_EXCEEDED = 3,
+        TEST_PASSED = 0,
+        NAN = 5
     };
 
     grader(string __code, configGrader __config); // grader element
@@ -67,11 +67,11 @@ private:
 
     enum RE_TYPE
     {
-        COMPILER_NOT_FOUND,
-        CODE_NOT_FOUND,
-        USUAL_FAIL,
-        IO_TESTS_NOT_FOUND,
-        IO_TESTS_FAILED_CONFIGURATION
+        COMPILER_NOT_FOUND = 4,
+        CODE_NOT_FOUND = 1,
+        USUAL_FAIL = 0,
+        IO_TESTS_NOT_FOUND = 2,
+        IO_TESTS_FAILED_CONFIGURATION = 3
     };
 
     RE_TYPE throwRE(RE_TYPE re);
